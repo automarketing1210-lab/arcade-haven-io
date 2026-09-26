@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the game catalog in `src/lib/games.ts` and render both modal and dedicated game pages through `GamePlayer`; this prevents behavior and content drift.
