@@ -2,7 +2,7 @@
 
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bike, Bomb, BrainCircuit, ChevronLeft, ChevronRight, Clock3, Crosshair, Flame, Gamepad2, Heart, Joystick, LayoutGrid, Maximize, Menu, MousePointer2, Play, Search, SlidersHorizontal, Sparkles, Star, Swords, Trophy, X } from "lucide-react";
+import { Bike, Bomb, BrainCircuit, ChevronLeft, ChevronRight, Clock3, Crosshair, Flame, Gamepad2, Heart, Joystick, LayoutGrid, Maximize, Menu, MousePointer2, Play, Search, SlidersHorizontal, Sparkles, Star, Swords, Trophy, Users, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { categories, formatPlays, games, type Category, type Game } from "@/lib/games";
 
 type Sort = "popular" | "new" | "rating";
-type View = "Все игры" | "История" | "Мои игры";
+type View = "Все игры" | "История" | "Мои игры" | "Новые" | "Популярные" | "Мультиплеер";
 
 const playableDemo = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111f;font-family:system-ui;color:#f8fafc}canvas{width:100%;height:100%;display:block}.hint{position:fixed;left:16px;top:14px;font-size:12px;color:#b7ff42;background:#07111fcc;padding:8px 11px;border-radius:6px}</style></head><body><canvas></canvas><div class="hint">WASD / стрелки · соберите кристаллы</div><script>const c=document.querySelector('canvas'),x=c.getContext('2d');let w,h,p={x:120,y:120},keys={},score=0,orbs=[];function size(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;w=c.width;h=c.height;p.x=Math.min(p.x,w-20);p.y=Math.min(p.y,h-20)}onresize=size;size();for(let i=0;i<18;i++)orbs.push({x:Math.random()*w,y:Math.random()*h});onkeydown=e=>keys[e.key.toLowerCase()]=1;onkeyup=e=>keys[e.key.toLowerCase()]=0;function loop(){let s=6*devicePixelRatio;p.x+=((keys.d||keys.arrowright)?s:0)-((keys.a||keys.arrowleft)?s:0);p.y+=((keys.s||keys.arrowdown)?s:0)-((keys.w||keys.arrowup)?s:0);p.x=Math.max(15,Math.min(w-15,p.x));p.y=Math.max(15,Math.min(h-15,p.y));x.fillStyle='#07111f';x.fillRect(0,0,w,h);x.strokeStyle='#18334c';x.lineWidth=1;for(let i=0;i<w;i+=60*devicePixelRatio){x.beginPath();x.moveTo(i,0);x.lineTo(i,h);x.stroke()}for(let i=0;i<h;i+=60*devicePixelRatio){x.beginPath();x.moveTo(0,i);x.lineTo(w,i);x.stroke()}orbs.forEach(o=>{if(Math.hypot(o.x-p.x,o.y-p.y)<28*devicePixelRatio){o.x=Math.random()*w;o.y=Math.random()*h;score++}x.fillStyle='#a3ff37';x.beginPath();x.arc(o.x,o.y,7*devicePixelRatio,0,7);x.fill()});x.fillStyle='#22d3ee';x.beginPath();x.arc(p.x,p.y,14*devicePixelRatio,0,7);x.fill();x.fillStyle='#fff';x.font=(18*devicePixelRatio)+'px system-ui';x.fillText('Счёт: '+score,18*devicePixelRatio,h-20*devicePixelRatio);requestAnimationFrame(loop)}loop()</script></body></html>`;
 
@@ -36,7 +36,7 @@ function SidebarContent({ compact, activeCategory, setCategory, view, setView }:
   return <div className="flex h-full flex-col gap-5">
     <Logo compact={compact} />
     <nav className="space-y-1" aria-label="Основная навигация">
-      {([ ["Все игры", LayoutGrid], ["История", Clock3], ["Мои игры", Heart] ] as const).map(([label, Icon]) => <Button key={label} variant="ghost" onClick={() => { setView(label); setCategory("Все"); }} className={cn("w-full justify-start gap-3 text-muted-foreground hover:text-foreground", view === label && "bg-accent text-foreground", compact && "justify-center px-0")} title={compact ? label : undefined}><Icon />{!compact && <span>{label}</span>}</Button>)}
+      {([ ["Все игры", LayoutGrid], ["Новые", Sparkles], ["Популярные", Zap], ["Мультиплеер", Users], ["История", Clock3], ["Мои игры", Heart] ] as const).map(([label, Icon]) => <Button key={label} variant="ghost" onClick={() => { setView(label); setCategory("Все"); }} className={cn("w-full justify-start gap-3 text-muted-foreground hover:text-foreground", view === label && "bg-accent text-foreground", compact && "justify-center px-0")} title={compact ? label : undefined}><Icon />{!compact && <span>{label}</span>}</Button>)}
     </nav>
     <div><p className={cn("mb-2 px-3 text-[10px] font-bold uppercase text-muted-foreground", compact && "sr-only")}>Категории</p><nav className="space-y-1">{categories.map(category => { const Icon = icons[category]; return <Button key={category} variant="ghost" onClick={() => { setCategory(category); setView("Все игры"); }} className={cn("w-full justify-start gap-3 text-muted-foreground hover:text-foreground", activeCategory === category && "bg-accent text-accent-foreground", compact && "justify-center px-0")} title={compact ? category : undefined}><Icon />{!compact && <><span className="min-w-0 flex-1 truncate text-left">{category}</span><span className="text-xs text-muted-foreground">{games.filter(game => game.category === category).length}</span></>}</Button>; })}</nav></div>
     {!compact && <div className="mt-auto"><Ad size="square" /></div>}
@@ -74,7 +74,7 @@ export function GamePortal() {
   const [favorites, setFavorites] = useStoredList("gamehaven-favorites"); const [history, setHistory] = useStoredList("gamehaven-history");
   const toggleFavorite = (slug: string) => setFavorites(favorites.includes(slug) ? favorites.filter(item => item !== slug) : [slug, ...favorites]);
   const markPlayed = (slug: string) => setHistory([slug, ...history.filter(item => item !== slug)].slice(0, 12));
-  const filtered = useMemo(() => games.filter(game => (category === "Все" || game.category === category) && (view !== "История" || history.includes(game.slug)) && (view !== "Мои игры" || favorites.includes(game.slug)) && `${game.title} ${game.tags.join(" ")}`.toLocaleLowerCase("ru").includes(query.toLocaleLowerCase("ru"))).sort((a,b) => sort === "popular" ? b.plays-a.plays : sort === "new" ? b.year-a.year : b.rating-a.rating), [category, view, query, sort, history, favorites]);
+  const filtered = useMemo(() => games.filter(game => (category === "Все" || game.category === category) && (view !== "История" || history.includes(game.slug)) && (view !== "Мои игры" || favorites.includes(game.slug)) && (view !== "Новые" || game.badge === "НОВОЕ") && (view !== "Популярные" || game.plays >= 6_000_000) && (view !== "Мультиплеер" || game.category === ".io" || game.tags.some(tag => ["онлайн", "мультиплеер"].includes(tag.toLocaleLowerCase("ru")))) && `${game.title} ${game.tags.join(" ")}`.toLocaleLowerCase("ru").includes(query.toLocaleLowerCase("ru"))).sort((a,b) => sort === "popular" ? b.plays-a.plays : sort === "new" ? b.year-a.year : b.rating-a.rating), [category, view, query, sort, history, favorites]);
   const openGame = (game: Game) => { setSelected(game); markPlayed(game.slug); };
   const heroGame = games[0];
   if (!heroGame) return null;
