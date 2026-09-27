@@ -2,6 +2,8 @@ import racingImage from "@/assets/game-racing.jpg";
 import actionImage from "@/assets/game-action.jpg";
 import puzzleImage from "@/assets/game-puzzle.jpg";
 import ioImage from "@/assets/game-io.jpg";
+import neonRiptideImage from "@/assets/cover-action-neon-riptide.jpg";
+import emberVaultImage from "@/assets/cover-action-ember-vault.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -211,7 +213,7 @@ export const games: Game[] = [
     tags: ["экшен"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["WASD — движение", "Мышь — действие"],
-    image: actionImage,
+    image: neonRiptideImage,
     rating: 4.4,
     plays: 1781000,
     year: 2026,
@@ -224,7 +226,7 @@ export const games: Game[] = [
     tags: ["экшен"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["WASD — движение", "Мышь — действие"],
-    image: actionImage,
+    image: emberVaultImage,
     rating: 4.5,
     plays: 1918000,
     year: 2026,
