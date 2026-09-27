@@ -8,6 +8,7 @@ import skyhookImage from "@/assets/cover-action-skyhook.jpg";
 import mossbladeImage from "@/assets/cover-action-mossblade.jpg";
 import prismaticSiegeImage from "@/assets/cover-action-prismatic-siege.jpg";
 import driftingLanternImage from "@/assets/cover-action-drifting-lantern.jpg";
+import ironGardenImage from "@/assets/cover-action-iron-garden.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -296,7 +297,7 @@ export const games: Game[] = [
     tags: ["экшен"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["WASD — движение", "Мышь — действие"],
-    image: actionImage,
+    image: ironGardenImage,
     rating: 4.1,
     plays: 2603000,
     year: 2026,
