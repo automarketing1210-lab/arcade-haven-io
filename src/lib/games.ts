@@ -5,6 +5,7 @@ import ioImage from "@/assets/game-io.jpg";
 import neonRiptideImage from "@/assets/cover-action-neon-riptide.jpg";
 import emberVaultImage from "@/assets/cover-action-ember-vault.jpg";
 import skyhookImage from "@/assets/cover-action-skyhook.jpg";
+import mossbladeImage from "@/assets/cover-action-mossblade.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -253,7 +254,7 @@ export const games: Game[] = [
     tags: ["экшен"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["WASD — движение", "Мышь — действие"],
-    image: actionImage,
+    image: mossbladeImage,
     rating: 4.7,
     plays: 2192000,
     year: 2026,
