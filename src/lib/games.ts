@@ -7,6 +7,7 @@ import emberVaultImage from "@/assets/cover-action-ember-vault.jpg";
 import skyhookImage from "@/assets/cover-action-skyhook.jpg";
 import mossbladeImage from "@/assets/cover-action-mossblade.jpg";
 import prismaticSiegeImage from "@/assets/cover-action-prismatic-siege.jpg";
+import driftingLanternImage from "@/assets/cover-action-drifting-lantern.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -281,7 +282,7 @@ export const games: Game[] = [
     tags: ["экшен"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["WASD — движение", "Мышь — действие"],
-    image: actionImage,
+    image: driftingLanternImage,
     rating: 4.9,
     plays: 2466000,
     year: 2026,
