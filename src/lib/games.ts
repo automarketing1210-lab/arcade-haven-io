@@ -11,6 +11,7 @@ import driftingLanternImage from "@/assets/cover-action-drifting-lantern.jpg";
 import ironGardenImage from "@/assets/cover-action-iron-garden.jpg";
 import veilRunnerImage from "@/assets/cover-action-veil-runner.jpg";
 import tideforgeImage from "@/assets/cover-action-tideforge.jpg";
+import solarSpiralImage from "@/assets/cover-action-solar-spiral.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -338,7 +339,7 @@ export const games: Game[] = [
     tags: ["экшен"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["WASD — движение", "Мышь — действие"],
-    image: actionImage,
+    image: solarSpiralImage,
     rating: 4.4,
     plays: 3014000,
     year: 2026,
