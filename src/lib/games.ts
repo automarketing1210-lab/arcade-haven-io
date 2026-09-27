@@ -4,6 +4,7 @@ import puzzleImage from "@/assets/game-puzzle.jpg";
 import ioImage from "@/assets/game-io.jpg";
 import neonRiptideImage from "@/assets/cover-action-neon-riptide.jpg";
 import emberVaultImage from "@/assets/cover-action-ember-vault.jpg";
+import skyhookImage from "@/assets/cover-action-skyhook.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -239,7 +240,7 @@ export const games: Game[] = [
     tags: ["экшен"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["WASD — движение", "Мышь — действие"],
-    image: actionImage,
+    image: skyhookImage,
     rating: 4.6,
     plays: 2055000,
     year: 2026,
