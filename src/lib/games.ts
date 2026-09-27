@@ -13,6 +13,7 @@ import veilRunnerImage from "@/assets/cover-action-veil-runner.jpg";
 import tideforgeImage from "@/assets/cover-action-tideforge.jpg";
 import solarSpiralImage from "@/assets/cover-action-solar-spiral.jpg";
 import floralContourImage from "@/assets/cover-action-floral-contour.jpg";
+import tideglassCartographerImage from "@/assets/cover-action-tideglass-cartographer.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -366,7 +367,7 @@ export const games: Game[] = [
     tags: ["приключения"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["Стрелки — движение", "Пробел — действие"],
-    image: actionImage,
+    image: tideglassCartographerImage,
     rating: 4.6,
     plays: 3288000,
     year: 2026,
