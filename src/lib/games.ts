@@ -14,6 +14,7 @@ import tideforgeImage from "@/assets/cover-action-tideforge.jpg";
 import solarSpiralImage from "@/assets/cover-action-solar-spiral.jpg";
 import floralContourImage from "@/assets/cover-action-floral-contour.jpg";
 import tideglassCartographerImage from "@/assets/cover-action-tideglass-cartographer.jpg";
+import clockworkTernImage from "@/assets/cover-adventure-clockwork-tern.jpg";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -380,7 +381,7 @@ export const games: Game[] = [
     tags: ["приключения"],
     description: "Новая игра из расширенного каталога GameHaven.",
     controls: ["Стрелки — движение", "Пробел — действие"],
-    image: actionImage,
+    image: clockworkTernImage,
     rating: 4.7,
     plays: 3425000,
     year: 2026,
