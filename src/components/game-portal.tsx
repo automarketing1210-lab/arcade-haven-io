@@ -2,92 +2,723 @@
 
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bike, Bomb, BrainCircuit, ChevronLeft, ChevronRight, Clock3, Crosshair, Flame, Gamepad2, Heart, Joystick, LayoutGrid, Maximize, Menu, MousePointer2, Play, Search, SlidersHorizontal, Sparkles, Star, Swords, Trophy, Users, X, Zap } from "lucide-react";
+import {
+  BadgeCheck,
+  Bike,
+  Bomb,
+  BrainCircuit,
+  Boxes,
+  CarFront,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
+  Clock3,
+  Crosshair,
+  Dices,
+  Flame,
+  Gamepad2,
+  Heart,
+  House,
+  Joystick,
+  LayoutGrid,
+  LetterText,
+  Maximize,
+  Menu,
+  MousePointer2,
+  MousePointerClick,
+  Palette,
+  Play,
+  RefreshCw,
+  Search,
+  Shield,
+  SlidersHorizontal,
+  Sparkles,
+  Spade,
+  Star,
+  Swords,
+  Trophy,
+  Users,
+  X,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { categories, formatPlays, games, type Category, type Game } from "@/lib/games";
 
 type Sort = "popular" | "new" | "rating";
-type View = "Все игры" | "История" | "Мои игры" | "Новые" | "Популярные" | "Мультиплеер";
+type View =
+  | "Все игры"
+  | "История"
+  | "Избранное"
+  | "Новые"
+  | "Популярные"
+  | "Обновлённые"
+  | "Оригинальные"
+  | "Мультиплеер"
+  | "Лидеры";
 
 const playableDemo = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111f;font-family:system-ui;color:#f8fafc}canvas{width:100%;height:100%;display:block}.hint{position:fixed;left:16px;top:14px;font-size:12px;color:#b7ff42;background:#07111fcc;padding:8px 11px;border-radius:6px}</style></head><body><canvas></canvas><div class="hint">WASD / стрелки · соберите кристаллы</div><script>const c=document.querySelector('canvas'),x=c.getContext('2d');let w,h,p={x:120,y:120},keys={},score=0,orbs=[];function size(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;w=c.width;h=c.height;p.x=Math.min(p.x,w-20);p.y=Math.min(p.y,h-20)}onresize=size;size();for(let i=0;i<18;i++)orbs.push({x:Math.random()*w,y:Math.random()*h});onkeydown=e=>keys[e.key.toLowerCase()]=1;onkeyup=e=>keys[e.key.toLowerCase()]=0;function loop(){let s=6*devicePixelRatio;p.x+=((keys.d||keys.arrowright)?s:0)-((keys.a||keys.arrowleft)?s:0);p.y+=((keys.s||keys.arrowdown)?s:0)-((keys.w||keys.arrowup)?s:0);p.x=Math.max(15,Math.min(w-15,p.x));p.y=Math.max(15,Math.min(h-15,p.y));x.fillStyle='#07111f';x.fillRect(0,0,w,h);x.strokeStyle='#18334c';x.lineWidth=1;for(let i=0;i<w;i+=60*devicePixelRatio){x.beginPath();x.moveTo(i,0);x.lineTo(i,h);x.stroke()}for(let i=0;i<h;i+=60*devicePixelRatio){x.beginPath();x.moveTo(0,i);x.lineTo(w,i);x.stroke()}orbs.forEach(o=>{if(Math.hypot(o.x-p.x,o.y-p.y)<28*devicePixelRatio){o.x=Math.random()*w;o.y=Math.random()*h;score++}x.fillStyle='#a3ff37';x.beginPath();x.arc(o.x,o.y,7*devicePixelRatio,0,7);x.fill()});x.fillStyle='#22d3ee';x.beginPath();x.arc(p.x,p.y,14*devicePixelRatio,0,7);x.fill();x.fillStyle='#fff';x.font=(18*devicePixelRatio)+'px system-ui';x.fillText('Счёт: '+score,18*devicePixelRatio,h-20*devicePixelRatio);requestAnimationFrame(loop)}loop()</script></body></html>`;
 
-const icons = { "Гонки": Bike, "Экшен": Swords, "Стрелялки": Crosshair, "Головоломки": BrainCircuit, "Спорт": Trophy, ".io": Joystick, "Приключения": Sparkles, "Казуальные": Gamepad2 };
+const icons = {
+  Экшен: Swords,
+  Приключения: Sparkles,
+  Аркадные: Joystick,
+  Настольные: Dices,
+  Карточные: Spade,
+  Кликеры: MousePointerClick,
+  Гонки: CarFront,
+  ".io": Palette,
+  Головоломки: BrainCircuit,
+  Стрелялки: Crosshair,
+  Симуляторы: Boxes,
+  Спорт: Trophy,
+  Стратегии: Shield,
+  Викторины: CircleHelp,
+  Слова: LetterText,
+};
 
 function useStoredList(key: string) {
   const [items, setItems] = useState<string[]>([]);
-  useEffect(() => { try { setItems(JSON.parse(localStorage.getItem(key) ?? "[]")); } catch { setItems([]); } }, [key]);
-  const update = (next: string[]) => { setItems(next); localStorage.setItem(key, JSON.stringify(next)); };
+  useEffect(() => {
+    try {
+      setItems(JSON.parse(localStorage.getItem(key) ?? "[]"));
+    } catch {
+      setItems([]);
+    }
+  }, [key]);
+  const update = (next: string[]) => {
+    setItems(next);
+    localStorage.setItem(key, JSON.stringify(next));
+  };
   return [items, update] as const;
 }
 
 function Logo({ compact = false }: { compact?: boolean }) {
-  return <Link to="/" className="flex items-center gap-2.5"><span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-glow"><Gamepad2 className="size-5" /></span>{!compact && <span className="text-lg font-black tracking-normal">GAME<span className="text-primary">HAVEN</span></span>}</Link>;
+  return (
+    <Link to="/" className="flex items-center gap-2.5">
+      <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-glow">
+        <Gamepad2 className="size-5" />
+      </span>
+      {!compact && (
+        <span className="text-lg font-black tracking-normal">
+          GAME<span className="text-primary">HAVEN</span>
+        </span>
+      )}
+    </Link>
+  );
 }
 
 function Ad({ size }: { size: "wide" | "square" }) {
-  return <div className={cn("grid place-items-center border border-dashed border-border bg-panel/50 text-center text-[10px] uppercase text-muted-foreground", size === "wide" ? "mx-auto h-[72px] w-full max-w-[728px]" : "h-[250px] w-full max-w-[300px]")}><span>Рекламное место<br />{size === "wide" ? "728 × 90" : "300 × 250"}</span></div>;
+  return (
+    <div
+      className={cn(
+        "grid place-items-center border border-dashed border-border bg-panel/50 text-center text-[10px] uppercase text-muted-foreground",
+        size === "wide"
+          ? "mx-auto h-[72px] w-full max-w-[728px]"
+          : "h-[250px] w-full max-w-[300px]",
+      )}
+    >
+      <span>
+        Рекламное место
+        <br />
+        {size === "wide" ? "728 × 90" : "300 × 250"}
+      </span>
+    </div>
+  );
 }
 
-function SidebarContent({ compact, activeCategory, setCategory, view, setView }: { compact: boolean; activeCategory: Category | "Все"; setCategory: (c: Category | "Все") => void; view: View; setView: (v: View) => void }) {
-  return <div className="flex h-full flex-col gap-5">
-    <Logo compact={compact} />
-    <nav className="space-y-1" aria-label="Основная навигация">
-      {([ ["Все игры", LayoutGrid], ["Новые", Sparkles], ["Популярные", Zap], ["Мультиплеер", Users], ["История", Clock3], ["Мои игры", Heart] ] as const).map(([label, Icon]) => <Button key={label} variant="ghost" onClick={() => { setView(label); setCategory("Все"); }} className={cn("w-full justify-start gap-3 text-muted-foreground hover:text-foreground", view === label && "bg-accent text-foreground", compact && "justify-center px-0")} title={compact ? label : undefined}><Icon />{!compact && <span>{label}</span>}</Button>)}
-    </nav>
-    <div><p className={cn("mb-2 px-3 text-[10px] font-bold uppercase text-muted-foreground", compact && "sr-only")}>Категории</p><nav className="space-y-1">{categories.map(category => { const Icon = icons[category]; return <Button key={category} variant="ghost" onClick={() => { setCategory(category); setView("Все игры"); }} className={cn("w-full justify-start gap-3 text-muted-foreground hover:text-foreground", activeCategory === category && "bg-accent text-accent-foreground", compact && "justify-center px-0")} title={compact ? category : undefined}><Icon />{!compact && <><span className="min-w-0 flex-1 truncate text-left">{category}</span><span className="text-xs text-muted-foreground">{games.filter(game => game.category === category).length}</span></>}</Button>; })}</nav></div>
-    {!compact && <div className="mt-auto"><Ad size="square" /></div>}
-  </div>;
+function SidebarContent({
+  compact,
+  activeCategory,
+  setCategory,
+  view,
+  setView,
+}: {
+  compact: boolean;
+  activeCategory: Category | "Все";
+  setCategory: (c: Category | "Все") => void;
+  view: View;
+  setView: (v: View) => void;
+}) {
+  return (
+    <div className="flex h-full flex-col gap-5">
+      <Logo compact={compact} />
+      <nav className="space-y-1" aria-label="Основная навигация">
+        {(
+          [
+            ["Все игры", House],
+            ["История", Clock3],
+            ["Избранное", Heart],
+            ["Новые", Sparkles],
+            ["Популярные", Flame],
+            ["Обновлённые", RefreshCw],
+            ["Оригинальные", BadgeCheck],
+            ["Мультиплеер", Users],
+            ["Лидеры", Trophy],
+          ] as const
+        ).map(([label, Icon]) => (
+          <Button
+            key={label}
+            variant="ghost"
+            onClick={() => {
+              setView(label);
+              setCategory("Все");
+            }}
+            className={cn(
+              "w-full justify-start gap-3 text-muted-foreground hover:text-foreground",
+              view === label && "bg-accent text-foreground",
+              compact && "justify-center px-0",
+            )}
+            title={compact ? label : undefined}
+          >
+            <Icon />
+            {!compact && <span>{label}</span>}
+          </Button>
+        ))}
+      </nav>
+      <div>
+        <p
+          className={cn(
+            "mb-2 px-3 text-[10px] font-bold uppercase text-muted-foreground",
+            compact && "sr-only",
+          )}
+        >
+          Категории
+        </p>
+        <nav className="space-y-1">
+          {categories.map((category) => {
+            const Icon = icons[category] ?? Gamepad2;
+            return (
+              <Button
+                key={category}
+                variant="ghost"
+                onClick={() => {
+                  setCategory(category);
+                  setView("Все игры");
+                }}
+                className={cn(
+                  "w-full justify-start gap-3 text-muted-foreground hover:text-foreground",
+                  activeCategory === category && "bg-accent text-accent-foreground",
+                  compact && "justify-center px-0",
+                )}
+                title={compact ? category : undefined}
+              >
+                <Icon />
+                {!compact && (
+                  <>
+                    <span className="min-w-0 flex-1 truncate text-left">{category}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {games.filter((game) => game.category === category).length}
+                    </span>
+                  </>
+                )}
+              </Button>
+            );
+          })}
+        </nav>
+      </div>
+      {!compact && (
+        <div className="mt-auto">
+          <Ad size="square" />
+        </div>
+      )}
+    </div>
+  );
 }
 
-function GameCard({ game, favorite, onFavorite, onPlay, wide = false }: { game: Game; favorite: boolean; onFavorite: () => void; onPlay: () => void; wide?: boolean }) {
-  return <article className={cn("group relative overflow-hidden rounded-lg border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-primary/60 hover:shadow-card", wide && "min-w-[260px] sm:min-w-[320px]")}>
-    <button type="button" onClick={onPlay} className="block w-full cursor-pointer text-left" aria-label={`Играть в ${game.title}`}>
-      <div className="relative aspect-[16/10] overflow-hidden"><img src={game.image} alt={game.title} width={1536} height={1024} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /><div className="absolute inset-0 bg-image-shade opacity-40 transition group-hover:opacity-70" />{game.badge && <span className={cn("absolute left-3 top-3 rounded px-2 py-1 text-[10px] font-black", game.badge === "НОВОЕ" ? "bg-info text-info-foreground" : "bg-primary text-primary-foreground")}>{game.badge}</span>}<span className="absolute inset-0 grid place-items-center opacity-0 transition group-hover:opacity-100"><span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-glow"><Play className="ml-0.5 fill-current" /></span></span></div>
-      <div className="p-3"><div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2"><div className="min-w-0"><h3 className="truncate font-bold text-card-foreground">{game.title}</h3><p className="mt-1 text-xs text-muted-foreground">{game.category} · {formatPlays(game.plays)} игр</p></div><span className="flex items-center gap-1 text-xs font-bold text-warning"><Star className="size-3 fill-current" />{game.rating}</span></div></div>
-    </button>
-    <Button variant="ghost" size="icon" onClick={onFavorite} className={cn("absolute right-2 top-2 bg-background/70 backdrop-blur hover:bg-background", favorite && "text-favorite")} aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}><Heart className={cn(favorite && "fill-current")} /></Button>
-  </article>;
+function GameCard({
+  game,
+  favorite,
+  onFavorite,
+  onPlay,
+  wide = false,
+}: {
+  game: Game;
+  favorite: boolean;
+  onFavorite: () => void;
+  onPlay: () => void;
+  wide?: boolean;
+}) {
+  return (
+    <article
+      className={cn(
+        "group relative overflow-hidden rounded-lg border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-primary/60 hover:shadow-card",
+        wide && "min-w-[260px] sm:min-w-[320px]",
+      )}
+    >
+      <button
+        type="button"
+        onClick={onPlay}
+        className="block w-full cursor-pointer text-left"
+        aria-label={`Играть в ${game.title}`}
+      >
+        <div className="relative aspect-[16/10] overflow-hidden">
+          <img
+            src={game.image}
+            alt={game.title}
+            width={1536}
+            height={1024}
+            loading="lazy"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-image-shade opacity-40 transition group-hover:opacity-70" />
+          {game.badge && (
+            <span
+              className={cn(
+                "absolute left-3 top-3 rounded px-2 py-1 text-[10px] font-black",
+                game.badge === "НОВОЕ"
+                  ? "bg-info text-info-foreground"
+                  : "bg-primary text-primary-foreground",
+              )}
+            >
+              {game.badge}
+            </span>
+          )}
+          <span className="absolute inset-0 grid place-items-center opacity-0 transition group-hover:opacity-100">
+            <span className="grid size-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-glow">
+              <Play className="ml-0.5 fill-current" />
+            </span>
+          </span>
+        </div>
+        <div className="p-3">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+            <div className="min-w-0">
+              <h3 className="truncate font-bold text-card-foreground">{game.title}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {game.category} · {formatPlays(game.plays)} игр
+              </p>
+            </div>
+            <span className="flex items-center gap-1 text-xs font-bold text-warning">
+              <Star className="size-3 fill-current" />
+              {game.rating}
+            </span>
+          </div>
+        </div>
+      </button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onFavorite}
+        className={cn(
+          "absolute right-2 top-2 bg-background/70 backdrop-blur hover:bg-background",
+          favorite && "text-favorite",
+        )}
+        aria-label={favorite ? "Убрать из избранного" : "Добавить в избранное"}
+      >
+        <Heart className={cn(favorite && "fill-current")} />
+      </Button>
+    </article>
+  );
 }
 
-export function GamePlayer({ game, favorite, onFavorite, onPlayed, embedded = false }: { game: Game; favorite: boolean; onFavorite: () => void; onPlayed: () => void; embedded?: boolean }) {
+export function GamePlayer({
+  game,
+  favorite,
+  onFavorite,
+  onPlayed,
+  embedded = false,
+}: {
+  game: Game;
+  favorite: boolean;
+  onFavorite: () => void;
+  onPlayed: () => void;
+  embedded?: boolean;
+}) {
   const frame = useRef<HTMLDivElement>(null);
   const [started, setStarted] = useState(false);
   const [vote, setVote] = useState<"like" | "dislike" | null>(null);
-  const similar = games.filter(item => item.slug !== game.slug && (item.category === game.category || item.tags.some(tag => game.tags.includes(tag)))).slice(0, 3);
-  const start = () => { setStarted(true); onPlayed(); };
+  const similar = games
+    .filter(
+      (item) =>
+        item.slug !== game.slug &&
+        (item.category === game.category || item.tags.some((tag) => game.tags.includes(tag))),
+    )
+    .slice(0, 3);
+  const start = () => {
+    setStarted(true);
+    onPlayed();
+  };
   const fullscreen = () => frame.current?.requestFullscreen?.();
-  return <div className={cn("space-y-5", embedded && "mx-auto max-w-[1500px] px-4 py-6 lg:px-8")}>
-    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3"><div className="min-w-0"><p className="text-xs font-bold uppercase text-primary">{game.category}</p><h1 className="truncate text-2xl font-black sm:text-3xl">{game.title}</h1></div><div className="flex shrink-0 gap-2"><Button variant="secondary" size="icon" onClick={onFavorite} aria-label="Избранное"><Heart className={cn(favorite && "fill-current text-favorite")} /></Button><Button variant="secondary" size="icon" onClick={fullscreen} aria-label="На весь экран"><Maximize /></Button></div></div>
-    <div ref={frame} className="relative aspect-video overflow-hidden rounded-lg border border-border bg-game"><img src={game.image} alt="" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover opacity-40" />{started ? <iframe title={`Игра ${game.title}`} srcDoc={playableDemo} className="absolute inset-0 h-full w-full border-0" allow="autoplay; fullscreen; gamepad" allowFullScreen /> : <div className="absolute inset-0 grid place-items-center"><Button size="lg" onClick={start} className="h-14 px-7 text-base shadow-glow"><Play className="fill-current" />Играть сейчас</Button></div>}</div>
-    <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{formatPlays(game.plays)} запусков · рейтинг {game.rating}</p><div className="flex gap-2"><Button variant={vote === "like" ? "default" : "secondary"} onClick={() => setVote("like")}><span>👍</span> Нравится</Button><Button variant={vote === "dislike" ? "default" : "secondary"} onClick={() => setVote("dislike")}><span>👎</span></Button></div></div>
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"><section><h2 className="text-lg font-black">Об игре</h2><p className="mt-2 leading-7 text-muted-foreground">{game.description}</p><div className="mt-4 flex flex-wrap gap-2">{game.tags.map(tag => <span key={tag} className="rounded bg-secondary px-2.5 py-1 text-xs">#{tag}</span>)}</div></section><aside><h2 className="text-lg font-black">Управление</h2><div className="mt-2 space-y-2">{game.controls.map(item => <div key={item} className="flex items-center gap-2 rounded border border-border bg-secondary/60 px-3 py-2 text-sm"><MousePointer2 className="size-4 text-primary" />{item}</div>)}</div></aside></div>
-    {similar.length > 0 && <section><h2 className="mb-3 text-lg font-black">Похожие игры</h2><div className="grid gap-3 sm:grid-cols-3">{similar.map(item => <Link key={item.slug} to="/game/$slug" params={{ slug: item.slug }} className="group overflow-hidden rounded-md border border-border bg-card"><img src={item.image} alt="" width={1536} height={1024} loading="lazy" className="aspect-video w-full object-cover transition group-hover:scale-105" /><div className="p-3 font-bold">{item.title}</div></Link>)}</div></section>}
-  </div>;
+  return (
+    <div className={cn("space-y-5", embedded && "mx-auto max-w-[1500px] px-4 py-6 lg:px-8")}>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-bold uppercase text-primary">{game.category}</p>
+          <h1 className="truncate text-2xl font-black sm:text-3xl">{game.title}</h1>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <Button variant="secondary" size="icon" onClick={onFavorite} aria-label="Избранное">
+            <Heart className={cn(favorite && "fill-current text-favorite")} />
+          </Button>
+          <Button variant="secondary" size="icon" onClick={fullscreen} aria-label="На весь экран">
+            <Maximize />
+          </Button>
+        </div>
+      </div>
+      <div
+        ref={frame}
+        className="relative aspect-video overflow-hidden rounded-lg border border-border bg-game"
+      >
+        <img
+          src={game.image}
+          alt=""
+          width={1536}
+          height={1024}
+          className="absolute inset-0 h-full w-full object-cover opacity-40"
+        />
+        {started ? (
+          <iframe
+            title={`Игра ${game.title}`}
+            srcDoc={playableDemo}
+            className="absolute inset-0 h-full w-full border-0"
+            allow="autoplay; fullscreen; gamepad"
+            allowFullScreen
+          />
+        ) : (
+          <div className="absolute inset-0 grid place-items-center">
+            <Button size="lg" onClick={start} className="h-14 px-7 text-base shadow-glow">
+              <Play className="fill-current" />
+              Играть сейчас
+            </Button>
+          </div>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          {formatPlays(game.plays)} запусков · рейтинг {game.rating}
+        </p>
+        <div className="flex gap-2">
+          <Button
+            variant={vote === "like" ? "default" : "secondary"}
+            onClick={() => setVote("like")}
+          >
+            <span>👍</span> Нравится
+          </Button>
+          <Button
+            variant={vote === "dislike" ? "default" : "secondary"}
+            onClick={() => setVote("dislike")}
+          >
+            <span>👎</span>
+          </Button>
+        </div>
+      </div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <section>
+          <h2 className="text-lg font-black">Об игре</h2>
+          <p className="mt-2 leading-7 text-muted-foreground">{game.description}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {game.tags.map((tag) => (
+              <span key={tag} className="rounded bg-secondary px-2.5 py-1 text-xs">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        </section>
+        <aside>
+          <h2 className="text-lg font-black">Управление</h2>
+          <div className="mt-2 space-y-2">
+            {game.controls.map((item) => (
+              <div
+                key={item}
+                className="flex items-center gap-2 rounded border border-border bg-secondary/60 px-3 py-2 text-sm"
+              >
+                <MousePointer2 className="size-4 text-primary" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </aside>
+      </div>
+      {similar.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-lg font-black">Похожие игры</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {similar.map((item) => (
+              <Link
+                key={item.slug}
+                to="/game/$slug"
+                params={{ slug: item.slug }}
+                className="group overflow-hidden rounded-md border border-border bg-card"
+              >
+                <img
+                  src={item.image}
+                  alt=""
+                  width={1536}
+                  height={1024}
+                  loading="lazy"
+                  className="aspect-video w-full object-cover transition group-hover:scale-105"
+                />
+                <div className="p-3 font-bold">{item.title}</div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
 }
 
 export function GamePortal() {
-  const [collapsed, setCollapsed] = useState(false); const [mobileMenuOpen, setMobileMenuOpen] = useState(false); const [category, setCategory] = useState<Category | "Все">("Все"); const [view, setView] = useState<View>("Все игры"); const [query, setQuery] = useState(""); const [sort, setSort] = useState<Sort>("popular"); const [selected, setSelected] = useState<Game | null>(null);
-  const [favorites, setFavorites] = useStoredList("gamehaven-favorites"); const [history, setHistory] = useStoredList("gamehaven-history");
-  const toggleFavorite = (slug: string) => setFavorites(favorites.includes(slug) ? favorites.filter(item => item !== slug) : [slug, ...favorites]);
-  const markPlayed = (slug: string) => setHistory([slug, ...history.filter(item => item !== slug)].slice(0, 12));
-  const filtered = useMemo(() => games.filter(game => (category === "Все" || game.category === category) && (view !== "История" || history.includes(game.slug)) && (view !== "Мои игры" || favorites.includes(game.slug)) && (view !== "Новые" || game.badge === "НОВОЕ") && (view !== "Популярные" || game.plays >= 6_000_000) && (view !== "Мультиплеер" || game.category === ".io" || game.tags.some(tag => ["онлайн", "мультиплеер"].includes(tag.toLocaleLowerCase("ru")))) && `${game.title} ${game.tags.join(" ")}`.toLocaleLowerCase("ru").includes(query.toLocaleLowerCase("ru"))).sort((a,b) => sort === "popular" ? b.plays-a.plays : sort === "new" ? b.year-a.year : b.rating-a.rating), [category, view, query, sort, history, favorites]);
-  const openGame = (game: Game) => { setSelected(game); markPlayed(game.slug); };
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [category, setCategory] = useState<Category | "Все">("Все");
+  const [view, setView] = useState<View>("Все игры");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<Sort>("popular");
+  const [selected, setSelected] = useState<Game | null>(null);
+  const [favorites, setFavorites] = useStoredList("gamehaven-favorites");
+  const [history, setHistory] = useStoredList("gamehaven-history");
+  const toggleFavorite = (slug: string) =>
+    setFavorites(
+      favorites.includes(slug) ? favorites.filter((item) => item !== slug) : [slug, ...favorites],
+    );
+  const markPlayed = (slug: string) =>
+    setHistory([slug, ...history.filter((item) => item !== slug)].slice(0, 12));
+  const filtered = useMemo(
+    () =>
+      games
+        .filter(
+          (game) =>
+            (category === "Все" || game.category === category) &&
+            (view !== "История" || history.includes(game.slug)) &&
+            (view !== "Избранное" || favorites.includes(game.slug)) &&
+            (view !== "Новые" || game.badge === "НОВОЕ") &&
+            (view !== "Обновлённые" || game.badge === "НОВОЕ") &&
+            (view !== "Популярные" || game.plays >= 6_000_000) &&
+            (view !== "Лидеры" || game.plays >= 0) &&
+            (view !== "Мультиплеер" ||
+              game.category === ".io" ||
+              game.tags.some((tag) =>
+                ["онлайн", "мультиплеер"].includes(tag.toLocaleLowerCase("ru")),
+              )) &&
+            `${game.title} ${game.tags.join(" ")}`
+              .toLocaleLowerCase("ru")
+              .includes(query.toLocaleLowerCase("ru")),
+        )
+        .sort((a, b) =>
+          sort === "popular"
+            ? b.plays - a.plays
+            : sort === "new"
+              ? b.year - a.year
+              : b.rating - a.rating,
+        ),
+    [category, view, query, sort, history, favorites],
+  );
+  const openGame = (game: Game) => {
+    setSelected(game);
+    markPlayed(game.slug);
+  };
   const heroGame = games[0];
   if (!heroGame) return null;
-  return <div className="min-h-screen bg-background text-foreground">
-    <aside className={cn("fixed inset-y-0 left-0 z-40 hidden border-r border-border bg-sidebar p-4 transition-[width] lg:block", collapsed ? "w-20" : "w-64")}><SidebarContent compact={collapsed} activeCategory={category} setCategory={setCategory} view={view} setView={setView} /><Button variant="secondary" size="icon" onClick={() => setCollapsed(value => !value)} className="absolute -right-4 top-20 rounded-full border" aria-label="Свернуть меню">{collapsed ? <ChevronRight /> : <ChevronLeft />}</Button></aside>
-    <main className={cn("transition-[padding]", collapsed ? "lg:pl-20" : "lg:pl-64")}>
-      <header className="sticky top-0 z-30 border-b border-border bg-background/90 px-4 py-3 backdrop-blur-xl lg:px-6"><div className="mx-auto grid max-w-[1500px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3"><Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}><SheetTrigger asChild><Button variant="secondary" size="icon" className="lg:hidden" aria-label="Открыть меню"><Menu /></Button></SheetTrigger><SheetContent side="left" className="w-[280px] p-5"><SheetTitle className="sr-only">Меню</SheetTitle><SidebarContent compact={false} activeCategory={category} setCategory={value => { setCategory(value); setMobileMenuOpen(false); }} view={view} setView={value => { setView(value); setMobileMenuOpen(false); }} /></SheetContent></Sheet><div className="relative min-w-0"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Найти игру или тег..." className="h-11 w-full rounded-md border border-border bg-secondary pl-10 pr-9 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" />{query && <Button variant="ghost" size="icon" onClick={() => setQuery("")} className="absolute right-1 top-1 size-9" aria-label="Очистить поиск"><X /></Button>}</div><Select value={sort} onValueChange={value => setSort(value as Sort)}><SelectTrigger className="h-11 w-11 border-border bg-secondary px-3 sm:w-[170px]"><SlidersHorizontal className="size-4 sm:hidden" /><span className="hidden sm:block"><SelectValue /></span></SelectTrigger><SelectContent><SelectItem value="popular">Популярные</SelectItem><SelectItem value="new">Новые</SelectItem><SelectItem value="rating">По рейтингу</SelectItem></SelectContent></Select></div></header>
-      <div className="mx-auto max-w-[1500px] px-4 py-5 lg:px-6"><Ad size="wide" />
-        <section className="relative mt-5 min-h-[390px] overflow-hidden rounded-lg border border-border"><img src={heroGame.image} alt="Neon Drift" width={1536} height={1024} className="absolute inset-0 h-full w-full object-cover" /><div className="absolute inset-0 bg-hero-shade" /><div className="relative flex min-h-[390px] max-w-xl flex-col justify-end p-6 sm:p-9"><span className="mb-3 w-fit rounded bg-primary px-2 py-1 text-[10px] font-black text-primary-foreground">ИГРА НЕДЕЛИ</span><h1 className="text-4xl font-black leading-tight sm:text-6xl">Скорость<br /><span className="text-primary">без границ</span></h1><p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground sm:text-base">Врывайтесь в Neon Drift — самые быстрые ночные гонки уже в браузере.</p><div className="mt-6 flex flex-wrap gap-3"><Button size="lg" onClick={() => openGame(heroGame)}><Play className="fill-current" />Играть бесплатно</Button><Button size="lg" variant="secondary" asChild><Link to="/game/$slug" params={{ slug: heroGame.slug }}>Подробнее</Link></Button></div></div></section>
-        <section className="mt-8"><div className="mb-4 flex items-center justify-between"><h2 className="flex items-center gap-2 text-xl font-black"><Flame className="text-hot" />Сейчас в тренде</h2><span className="text-xs text-muted-foreground">Листайте →</span></div><div className="no-scrollbar flex gap-4 overflow-x-auto pb-3">{games.slice(0,5).map(game => <GameCard key={game.slug} game={game} favorite={favorites.includes(game.slug)} onFavorite={() => toggleFavorite(game.slug)} onPlay={() => openGame(game)} wide />)}</div></section>
-        <section className="mt-8"><div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3"><div className="min-w-0"><p className="text-xs font-bold uppercase text-primary">{category === "Все" ? view : category}</p><h2 className="truncate text-2xl font-black">{query ? `Результаты: «${query}»` : category === "Все" ? "Все игры" : category}</h2></div><span className="text-sm text-muted-foreground">{filtered.length} игр</span></div>{filtered.length ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">{filtered.map(game => <GameCard key={game.slug} game={game} favorite={favorites.includes(game.slug)} onFavorite={() => toggleFavorite(game.slug)} onPlay={() => openGame(game)} />)}</div> : <div className="grid min-h-56 place-items-center rounded-lg border border-dashed border-border text-center"><div><Bomb className="mx-auto size-8 text-muted-foreground" /><p className="mt-3 font-bold">Игры не найдены</p><p className="text-sm text-muted-foreground">Попробуйте другой запрос или категорию</p></div></div>}</section>
-      </div>
-    </main>
-    <Dialog open={Boolean(selected)} onOpenChange={open => !open && setSelected(null)}>{selected && <DialogContent className="max-h-[94vh] max-w-[1100px] overflow-y-auto border-border bg-background p-4 sm:p-6"><DialogTitle className="sr-only">{selected.title}</DialogTitle><DialogDescription className="sr-only">Запуск и информация об игре</DialogDescription><GamePlayer game={selected} favorite={favorites.includes(selected.slug)} onFavorite={() => toggleFavorite(selected.slug)} onPlayed={() => markPlayed(selected.slug)} /></DialogContent>}</Dialog>
-  </div>;
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 hidden border-r border-border bg-sidebar p-4 transition-[width] lg:block",
+          collapsed ? "w-20" : "w-64",
+        )}
+      >
+        <SidebarContent
+          compact={collapsed}
+          activeCategory={category}
+          setCategory={setCategory}
+          view={view}
+          setView={setView}
+        />
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={() => setCollapsed((value) => !value)}
+          className="absolute -right-4 top-20 rounded-full border"
+          aria-label="Свернуть меню"
+        >
+          {collapsed ? <ChevronRight /> : <ChevronLeft />}
+        </Button>
+      </aside>
+      <main className={cn("transition-[padding]", collapsed ? "lg:pl-20" : "lg:pl-64")}>
+        <header className="sticky top-0 z-30 border-b border-border bg-background/90 px-4 py-3 backdrop-blur-xl lg:px-6">
+          <div className="mx-auto grid max-w-[1500px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="lg:hidden"
+                  aria-label="Открыть меню"
+                >
+                  <Menu />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[280px] p-5">
+                <SheetTitle className="sr-only">Меню</SheetTitle>
+                <SidebarContent
+                  compact={false}
+                  activeCategory={category}
+                  setCategory={(value) => {
+                    setCategory(value);
+                    setMobileMenuOpen(false);
+                  }}
+                  view={view}
+                  setView={(value) => {
+                    setView(value);
+                    setMobileMenuOpen(false);
+                  }}
+                />
+              </SheetContent>
+            </Sheet>
+            <div className="relative min-w-0">
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Найти игру или тег..."
+                className="h-11 w-full rounded-md border border-border bg-secondary pl-10 pr-9 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+              {query && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setQuery("")}
+                  className="absolute right-1 top-1 size-9"
+                  aria-label="Очистить поиск"
+                >
+                  <X />
+                </Button>
+              )}
+            </div>
+            <Select value={sort} onValueChange={(value) => setSort(value as Sort)}>
+              <SelectTrigger className="h-11 w-11 border-border bg-secondary px-3 sm:w-[170px]">
+                <SlidersHorizontal className="size-4 sm:hidden" />
+                <span className="hidden sm:block">
+                  <SelectValue />
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="popular">Популярные</SelectItem>
+                <SelectItem value="new">Новые</SelectItem>
+                <SelectItem value="rating">По рейтингу</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </header>
+        <div className="mx-auto max-w-[1500px] px-4 py-5 lg:px-6">
+          <Ad size="wide" />
+          <section className="relative mt-5 min-h-[390px] overflow-hidden rounded-lg border border-border">
+            <img
+              src={heroGame.image}
+              alt="Neon Drift"
+              width={1536}
+              height={1024}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-hero-shade" />
+            <div className="relative flex min-h-[390px] max-w-xl flex-col justify-end p-6 sm:p-9">
+              <span className="mb-3 w-fit rounded bg-primary px-2 py-1 text-[10px] font-black text-primary-foreground">
+                ИГРА НЕДЕЛИ
+              </span>
+              <h1 className="text-4xl font-black leading-tight sm:text-6xl">
+                Скорость
+                <br />
+                <span className="text-primary">без границ</span>
+              </h1>
+              <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground sm:text-base">
+                Врывайтесь в Neon Drift — самые быстрые ночные гонки уже в браузере.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button size="lg" onClick={() => openGame(heroGame)}>
+                  <Play className="fill-current" />
+                  Играть бесплатно
+                </Button>
+                <Button size="lg" variant="secondary" asChild>
+                  <Link to="/game/$slug" params={{ slug: heroGame.slug }}>
+                    Подробнее
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </section>
+          <section className="mt-8">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-xl font-black">
+                <Flame className="text-hot" />
+                Сейчас в тренде
+              </h2>
+              <span className="text-xs text-muted-foreground">Листайте →</span>
+            </div>
+            <div className="no-scrollbar flex gap-4 overflow-x-auto pb-3">
+              {games.slice(0, 5).map((game) => (
+                <GameCard
+                  key={game.slug}
+                  game={game}
+                  favorite={favorites.includes(game.slug)}
+                  onFavorite={() => toggleFavorite(game.slug)}
+                  onPlay={() => openGame(game)}
+                  wide
+                />
+              ))}
+            </div>
+          </section>
+          <section className="mt-8">
+            <div className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase text-primary">
+                  {category === "Все" ? view : category}
+                </p>
+                <h2 className="truncate text-2xl font-black">
+                  {query ? `Результаты: «${query}»` : category === "Все" ? "Все игры" : category}
+                </h2>
+              </div>
+              <span className="text-sm text-muted-foreground">{filtered.length} игр</span>
+            </div>
+            {filtered.length ? (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {filtered.map((game) => (
+                  <GameCard
+                    key={game.slug}
+                    game={game}
+                    favorite={favorites.includes(game.slug)}
+                    onFavorite={() => toggleFavorite(game.slug)}
+                    onPlay={() => openGame(game)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="grid min-h-56 place-items-center rounded-lg border border-dashed border-border text-center">
+                <div>
+                  <Bomb className="mx-auto size-8 text-muted-foreground" />
+                  <p className="mt-3 font-bold">Игры не найдены</p>
+                  <p className="text-sm text-muted-foreground">
+                    Попробуйте другой запрос или категорию
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+      </main>
+      <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
+        {selected && (
+          <DialogContent className="max-h-[94vh] max-w-[1100px] overflow-y-auto border-border bg-background p-4 sm:p-6">
+            <DialogTitle className="sr-only">{selected.title}</DialogTitle>
+            <DialogDescription className="sr-only">Запуск и информация об игре</DialogDescription>
+            <GamePlayer
+              game={selected}
+              favorite={favorites.includes(selected.slug)}
+              onFavorite={() => toggleFavorite(selected.slug)}
+              onPlayed={() => markPlayed(selected.slug)}
+            />
+          </DialogContent>
+        )}
+      </Dialog>
+    </div>
+  );
 }
