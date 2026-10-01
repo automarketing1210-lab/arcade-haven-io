@@ -46,7 +46,7 @@ export type Game = {
   year: number;
   badge?: "ХИТ" | "НОВОЕ" | "ТОП";
   accent: "lime" | "cyan" | "coral";
-  embedUrl?: string;
+  embedUrl?: string | undefined;
 };
 
 export const games: Game[] = [

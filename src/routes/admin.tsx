@@ -39,12 +39,12 @@ function AdminPage() {
   const edit = (game: Game) => { setEditing(game.slug); setForm({ slug: game.slug, title: game.title, category: game.category, embedUrl: game.embedUrl ?? "", description: game.description, tags: game.tags.join(", "), controls: game.controls.join("\n"), image: game.image }); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!form.title.trim()) return toast.error("Введите название");
+    if (!form.title.trim()) { toast.error("Введите название"); return; }
     const embedUrl = extractUrl(form.embedUrl);
-    if (form.embedUrl.trim() && !embedUrl) return toast.error("Ссылка на игру должна начинаться с https://");
+    if (form.embedUrl.trim() && !embedUrl) { toast.error("Ссылка на игру должна начинаться с https://"); return; }
     const existing = editing ? catalog.find(game => game.slug === editing) : undefined;
     const slug = editing ?? slugify(form.title);
-    if (!editing && catalog.some(game => game.slug === slug)) return toast.error("Игра с таким названием уже есть");
+    if (!editing && catalog.some(game => game.slug === slug)) { toast.error("Игра с таким названием уже есть"); return; }
     saveGame({ ...(existing ?? { rating: 4.5, plays: 0, year: new Date().getFullYear(), badge: "НОВОЕ" as const, accent: "lime" as const }), slug, title: form.title.trim(), category: form.category, description: form.description.trim(), tags: form.tags.split(",").map(t => t.trim()).filter(Boolean), controls: form.controls.split("\n").map(t => t.trim()).filter(Boolean), image: form.image || coverOptions[0]?.image || "", embedUrl: embedUrl || undefined });
     toast.success(editing ? "Игра обновлена" : "Игра добавлена");
     setEditing(null); setForm(emptyForm());
