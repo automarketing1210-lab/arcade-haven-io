@@ -2,27 +2,22 @@
 
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bike, Bomb, BrainCircuit, ChevronLeft, ChevronRight, Clock3, Crosshair, Flame, Gamepad2, Heart, Joystick, LayoutGrid, Maximize, Menu, MousePointer2, Play, Search, SlidersHorizontal, Sparkles, Star, Swords, Trophy, Users, X, Zap } from "lucide-react";
+import { Bike, Bomb, BrainCircuit, CheckCircle2, ChevronLeft, ChevronRight, Clock3, Crosshair, Flame, Gamepad2, Heart, Joystick, LayoutGrid, Maximize, Menu, MousePointer2, Play, Search, SlidersHorizontal, Sparkles, Star, Swords, Trophy, Users, X, Zap, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { AuthButton } from "@/components/auth-controls";
 import { cn } from "@/lib/utils";
-import { categories, formatPlays, games, type Category, type Game } from "@/lib/games";
+import { categories, formatPlays, type Category, type Game } from "@/lib/games";
+import { useAuth, useCatalog, useProfile } from "@/lib/demo-store";
 
 type Sort = "popular" | "new" | "rating";
 type View = "Все игры" | "История" | "Мои игры" | "Новые" | "Популярные" | "Мультиплеер";
 
-const playableDemo = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111f;font-family:system-ui;color:#f8fafc}canvas{width:100%;height:100%;display:block}.hint{position:fixed;left:16px;top:14px;font-size:12px;color:#b7ff42;background:#07111fcc;padding:8px 11px;border-radius:6px}</style></head><body><canvas></canvas><div class="hint">WASD / стрелки · соберите кристаллы</div><script>const c=document.querySelector('canvas'),x=c.getContext('2d');let w,h,p={x:120,y:120},keys={},score=0,orbs=[];function size(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;w=c.width;h=c.height;p.x=Math.min(p.x,w-20);p.y=Math.min(p.y,h-20)}onresize=size;size();for(let i=0;i<18;i++)orbs.push({x:Math.random()*w,y:Math.random()*h});onkeydown=e=>keys[e.key.toLowerCase()]=1;onkeyup=e=>keys[e.key.toLowerCase()]=0;function loop(){let s=6*devicePixelRatio;p.x+=((keys.d||keys.arrowright)?s:0)-((keys.a||keys.arrowleft)?s:0);p.y+=((keys.s||keys.arrowdown)?s:0)-((keys.w||keys.arrowup)?s:0);p.x=Math.max(15,Math.min(w-15,p.x));p.y=Math.max(15,Math.min(h-15,p.y));x.fillStyle='#07111f';x.fillRect(0,0,w,h);x.strokeStyle='#18334c';x.lineWidth=1;for(let i=0;i<w;i+=60*devicePixelRatio){x.beginPath();x.moveTo(i,0);x.lineTo(i,h);x.stroke()}for(let i=0;i<h;i+=60*devicePixelRatio){x.beginPath();x.moveTo(0,i);x.lineTo(w,i);x.stroke()}orbs.forEach(o=>{if(Math.hypot(o.x-p.x,o.y-p.y)<28*devicePixelRatio){o.x=Math.random()*w;o.y=Math.random()*h;score++}x.fillStyle='#a3ff37';x.beginPath();x.arc(o.x,o.y,7*devicePixelRatio,0,7);x.fill()});x.fillStyle='#22d3ee';x.beginPath();x.arc(p.x,p.y,14*devicePixelRatio,0,7);x.fill();x.fillStyle='#fff';x.font=(18*devicePixelRatio)+'px system-ui';x.fillText('Счёт: '+score,18*devicePixelRatio,h-20*devicePixelRatio);requestAnimationFrame(loop)}loop()</script></body></html>`;
+const playableDemo = PLAYABLE_DEMO_PLACEHOLDER;
 
-const icons = { "Гонки": Bike, "Экшен": Swords, "Стрелялки": Crosshair, "Головоломки": BrainCircuit, "Спорт": Trophy, ".io": Joystick, "Приключения": Sparkles, "Казуальные": Gamepad2 };
-
-function useStoredList(key: string) {
-  const [items, setItems] = useState<string[]>([]);
-  useEffect(() => { try { setItems(JSON.parse(localStorage.getItem(key) ?? "[]")); } catch { setItems([]); } }, [key]);
-  const update = (next: string[]) => { setItems(next); localStorage.setItem(key, JSON.stringify(next)); };
-  return [items, update] as const;
-}
+const icons: Partial<Record<Category, LucideIcon>> = { "Гонки": Bike, "Экшен": Swords, "Стрелялки": Crosshair, "Головоломки": BrainCircuit, "Спорт": Trophy, ".io": Joystick, "Приключения": Sparkles };
 
 function Logo({ compact = false }: { compact?: boolean }) {
   return <Link to="/" className="flex items-center gap-2.5"><span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-glow"><Gamepad2 className="size-5" /></span>{!compact && <span className="text-lg font-black tracking-normal">GAME<span className="text-primary">HAVEN</span></span>}</Link>;
