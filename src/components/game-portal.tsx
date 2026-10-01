@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Bike, Bomb, BrainCircuit, CheckCircle2, ChevronLeft, ChevronRight, Clock3, Crosshair, Flame, Gamepad2, Heart, Joystick, LayoutGrid, Maximize, Menu, MousePointer2, Play, Search, SlidersHorizontal, Sparkles, Star, Swords, Trophy, Users, X, Zap, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
