@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep the game catalog in `src/lib/games.ts` and render both modal and dedicated game pages through `GamePlayer`; this prevents behavior and content drift.
+- Demo accounts (111 admin / 222 player) and catalog edits live in browser storage via src/lib/demo-store.ts; user chose demo mode, so no server auth.
