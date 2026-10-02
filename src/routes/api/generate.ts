@@ -15,7 +15,7 @@ const Body = z.object({
 
 // Reads an SSE body and calls onEvent for each parsed JSON payload.
 async function readSse(body: ReadableStream<Uint8Array>, onEvent: (type: string, data: any) => void) {
-  const reader = body.pipeThrough(new TextDecoderStream()).getReader();
+  const reader = body.pipeThrough(new TextDecoderStream() as unknown as ReadableWritablePair<string, Uint8Array>).getReader();
   let buffer = "";
   for (;;) {
     const { value, done } = await reader.read();
@@ -92,7 +92,7 @@ export const Route = createFileRoute("/api/generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.LOVABLE_API_KEY;
+        const apiKey = process.env['LOVABLE_API_KEY'];
         if (!apiKey) return Response.json({ error: "AI не настроен" }, { status: 500 });
         const parsed = Body.safeParse(await request.json().catch(() => null));
         if (!parsed.success) return Response.json({ error: "Неверный запрос" }, { status: 400 });
