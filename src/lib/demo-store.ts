@@ -81,13 +81,16 @@ export function useCatalog() {
   ], [custom, removed]);
   return {
     catalog,
+    // Read the latest stored lists so async/sequential saves never overwrite each other.
     saveGame: (game: Game) => {
-      setCustom([game, ...custom.filter(item => item.slug !== game.slug)]);
-      if (removed.includes(game.slug)) setRemoved(removed.filter(item => item !== game.slug));
+      const latest = read("gamehaven-custom-games", EMPTY_GAMES); const gone = read("gamehaven-removed-games", EMPTY_LIST);
+      setCustom([game, ...latest.filter(item => item.slug !== game.slug)]);
+      if (gone.includes(game.slug)) setRemoved(gone.filter(item => item !== game.slug));
     },
     deleteGame: (slug: string) => {
-      setCustom(custom.filter(item => item.slug !== slug));
-      if (baseGames.some(game => game.slug === slug)) setRemoved([...removed, slug]);
+      const latest = read("gamehaven-custom-games", EMPTY_GAMES); const gone = read("gamehaven-removed-games", EMPTY_LIST);
+      setCustom(latest.filter(item => item.slug !== slug));
+      if (baseGames.some(game => game.slug === slug)) setRemoved([...gone, slug]);
     },
     resetCatalog: () => { setCustom([]); setRemoved([]); },
   };
