@@ -25,7 +25,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 type Form = { slug: string; title: string; category: Category; embedUrl: string; description: string; tags: string; controls: string; image: string };
-const emptyForm = (): Form => ({ slug: "", title: "", category: "Экшен", embedUrl: "", description: "", tags: "", controls: "WASD — движение\nМышь — прицел", image: coverOptions[0]?.image ?? "" });
+const emptyForm = (): Form => ({ slug: "", title: "", category: "Экшен", embedUrl: randomNetlifyUrl(), description: "", tags: "", controls: "WASD — движение\nМышь — прицел", image: coverOptions[0]?.image ?? "" });
 
 const translit: Record<string, string> = { а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"e",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"c",ч:"ch",ш:"sh",щ:"sch",ы:"y",э:"e",ю:"yu",я:"ya" };
 const slugify = (text: string) => text.toLowerCase().split("").map(ch => translit[ch] ?? ch).join("").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `game-${Date.now()}`;
