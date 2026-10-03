@@ -27,7 +27,7 @@ export const Route = createFileRoute("/api/pin-catalog")({
             if (match) {
               const ext = match[1] === "png" ? "png" : match[1] === "webp" ? "webp" : "jpg";
               const file = `${game.slug}-${Date.now()}.${ext}`;
-              await fs.writeFile(path.join(imgDir, file), Buffer.from(match[2], "base64"));
+              await fs.writeFile(path.join(imgDir, file), Buffer.from(match[2] ?? "", "base64"));
               next.image = `/pinned/${file}`;
             }
             map.set(game.slug, next);
