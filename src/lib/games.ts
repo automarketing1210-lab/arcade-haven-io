@@ -82,7 +82,7 @@ const baseCatalog: Game[] = [
     description:
       "Покоряйте летающий город с крюком-кошкой и пробирайтесь через головокружительные уровни.",
     controls: ["WASD — движение", "Мышь — прицел", "E — крюк"],
-    image: actionImage,
+    image: skyhookImage,
     rating: 4.8,
     plays: 7600000,
     year: 2026,
@@ -97,7 +97,7 @@ const baseCatalog: Game[] = [
     description:
       "Меняйте гравитацию, соединяйте кристаллы и открывайте порталы в футуристической лаборатории.",
     controls: ["Мышь — выбор", "R — перезапуск", "Z — отмена"],
-    image: puzzleImage,
+    image: prismaticVaultImage,
     rating: 4.7,
     plays: 4200000,
     year: 2026,
@@ -112,7 +112,7 @@ const baseCatalog: Game[] = [
     description:
       "Соревнуйтесь на воздушных аренах, сталкивайте соперников и останьтесь последним пилотом.",
     controls: ["WASD — движение", "Мышь — камера", "Пробел — ускорение"],
-    image: ioImage,
+    image: neonRiptideImage,
     rating: 4.6,
     plays: 9100000,
     year: 2026,
