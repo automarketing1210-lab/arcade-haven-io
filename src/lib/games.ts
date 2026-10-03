@@ -16,6 +16,14 @@ import floralContourImage from "@/assets/cover-action-floral-contour.jpg";
 import tideglassCartographerImage from "@/assets/cover-action-tideglass-cartographer.jpg";
 import clockworkTernImage from "@/assets/cover-adventure-clockwork-tern.jpg";
 import prismaticVaultImage from "@/assets/cover-adventure-prismatic-vault.jpg";
+import strikePointImage from "@/assets/strike-point.jpg";
+import turboLeagueImage from "@/assets/turbo-league.jpg";
+import blockBloomImage from "@/assets/block-bloom.jpg";
+import zeroZoneImage from "@/assets/zero-zone.jpg";
+import circuitSprintImage from "@/assets/circuit-sprint.jpg";
+import portalPawsImage from "@/assets/portal-paws.jpg";
+import goalRushImage from "@/assets/goal-rush.jpg";
+import pixelFrontierImage from "@/assets/pixel-frontier.jpg";
 import pinnedGames from "@/lib/pinned-games.json";
 export type Category =
   | "Экшен"
@@ -119,7 +127,7 @@ const baseCatalog: Game[] = [
     description:
       "Быстрые тактические матчи на компактных аренах с точной стрельбой и мгновенным стартом.",
     controls: ["WASD — движение", "Мышь — прицел", "R — перезарядка"],
-    image: actionImage,
+    image: strikePointImage,
     rating: 4.5,
     plays: 6500000,
     year: 2026,
@@ -133,7 +141,7 @@ const baseCatalog: Game[] = [
     description:
       "Футбол на реактивных машинах: забивайте с воздуха и защищайте ворота вместе с командой.",
     controls: ["Стрелки — движение", "X — прыжок", "C — ускорение"],
-    image: racingImage,
+    image: turboLeagueImage,
     rating: 4.7,
     plays: 5900000,
     year: 2026,
@@ -146,7 +154,7 @@ const baseCatalog: Game[] = [
     tags: ["блоки", "релакс", "комбо"],
     description: "Собирайте сияющие фигуры в линии и создавайте длинные цепочки комбо без таймера.",
     controls: ["Мышь — перемещение", "Клик — разместить", "Esc — пауза"],
-    image: puzzleImage,
+    image: blockBloomImage,
     rating: 4.4,
     plays: 3800000,
     year: 2026,
@@ -160,7 +168,7 @@ const baseCatalog: Game[] = [
     tags: ["выживание", "арена", "волны"],
     description: "Отбивайтесь от волн дронов, комбинируйте оружие и продержитесь до эвакуации.",
     controls: ["WASD — движение", "Мышь — атака", "1–3 — оружие"],
-    image: ioImage,
+    image: zeroZoneImage,
     rating: 4.6,
     plays: 8100000,
     year: 2026,
@@ -173,7 +181,7 @@ const baseCatalog: Game[] = [
     tags: ["скорость", "тайм-атак", "аркада"],
     description: "Короткие техничные трассы, призрачные соперники и борьба за сотые доли секунды.",
     controls: ["WASD — движение", "Shift — нитро", "R — рестарт"],
-    image: racingImage,
+    image: circuitSprintImage,
     rating: 4.3,
     plays: 2700000,
     year: 2026,
@@ -187,7 +195,7 @@ const baseCatalog: Game[] = [
     description:
       "Помогите космическому коту вернуться домой, прыгая между измерениями и собирая звёзды.",
     controls: ["Стрелки — движение", "Пробел — прыжок", "E — портал"],
-    image: puzzleImage,
+    image: portalPawsImage,
     rating: 4.8,
     plays: 3400000,
     year: 2026,
@@ -201,7 +209,7 @@ const baseCatalog: Game[] = [
     tags: ["футбол", "пенальти", "быстрая"],
     description: "Серия пенальти с идеальной физикой удара. Читайте вратаря и попадайте в девятку.",
     controls: ["Мышь — направление", "Удержание — сила", "Пробел — удар"],
-    image: ioImage,
+    image: goalRushImage,
     rating: 4.2,
     plays: 2100000,
     year: 2026,
@@ -214,7 +222,7 @@ const baseCatalog: Game[] = [
     tags: ["крафт", "исследование", "пиксели"],
     description: "Исследуйте уютный бесконечный мир, собирайте ресурсы и стройте собственную базу.",
     controls: ["WASD — движение", "Мышь — действие", "I — инвентарь"],
-    image: actionImage,
+    image: pixelFrontierImage,
     rating: 4.5,
     plays: 4700000,
     year: 2026,
