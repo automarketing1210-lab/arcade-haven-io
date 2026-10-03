@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Check, FileText, ImagePlus, Loader2, Pencil, Plus, RotateCcw, ShieldAlert, Trash2, Type, Wand2 } from "lucide-react";
+import { Check, FileText, ImagePlus, Loader2, Pencil, Pin, Plus, RotateCcw, ShieldAlert, Trash2, Type, Wand2 } from "lucide-react";
 import { randomNetlifyUrl, requestGeneration, shrinkImage } from "@/lib/ai-generate";
 import { toast } from "sonner";
 import { PageShell, AuthButton } from "@/components/auth-controls";
@@ -57,6 +57,22 @@ function AdminPage() {
     for (const slug of [...selected]) { const game = catalogRef.current.find(g => g.slug === slug); if (!game) continue; try { await run(game, "cover"); setSelected(s => s.filter(x => x !== slug)); } catch { break; } }
     setBatchRunning(false);
   };
+  const [pinning, setPinning] = useState(false);
+  const unpinned = (() => { if (typeof window === "undefined") return 0; try { return (JSON.parse(localStorage.getItem("gamehaven-custom-games") ?? "[]") as Game[]).length; } catch { return 0; } })();
+  // Saves every locally generated/edited game (covers included) into the site itself.
+  const pinAll = async () => {
+    setPinning(true);
+    try {
+      const custom = JSON.parse(localStorage.getItem("gamehaven-custom-games") ?? "[]") as Game[];
+      const res = await fetch("/api/pin-catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ games: custom }) });
+      const json = await res.json().catch(() => ({})) as { error?: string; pinned?: number };
+      if (!res.ok) throw new Error(json.error ?? `Ошибка ${res.status}`);
+      localStorage.setItem("gamehaven-custom-games", "[]");
+      toast.success(`Закреплено игр: ${json.pinned}`);
+      setTimeout(() => window.location.reload(), 1200);
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Не удалось закрепить"); }
+    finally { setPinning(false); }
+  };
   if (!isAdmin) return <PageShell><div className="grid min-h-[60vh] place-items-center px-4 text-center"><div><ShieldAlert className="mx-auto size-12 text-primary" /><h1 className="mt-4 text-2xl font-black">{user ? "Нет доступа к админке" : "Войдите как администратор"}</h1><p className="mt-2 text-muted-foreground">Панель доступна только администратору.</p><div className="mt-5 flex justify-center gap-2">{user ? <Button asChild><Link to="/profile">Мой профиль</Link></Button> : <AuthButton />}</div></div></div></PageShell>;
   const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm(current => ({ ...current, [key]: value }));
   const edit = (game: Game) => { setEditing(game.slug); setForm({ slug: game.slug, title: game.title, category: game.category, embedUrl: game.embedUrl ?? "", description: game.description, tags: game.tags.join(", "), controls: game.controls.join("\n"), image: game.image }); window.scrollTo({ top: 0, behavior: "smooth" }); };
@@ -73,7 +89,7 @@ function AdminPage() {
     setEditing(null); setForm(emptyForm());
   };
   return <PageShell><div className="mx-auto max-w-[1200px] space-y-6 px-4 py-6 lg:px-8">
-    <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase text-primary">Администратор</p><h1 className="text-3xl font-black">Каталог игр</h1><p className="text-sm text-muted-foreground">Демо-режим: изменения видны только в этом браузере.</p></div><Button variant="secondary" onClick={() => { if (confirm("Вернуть исходный каталог?")) resetCatalog(); }}><RotateCcw />Сбросить каталог</Button></div>
+    <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase text-primary">Администратор</p><h1 className="text-3xl font-black">Каталог игр</h1><p className="text-sm text-muted-foreground">Демо-режим: изменения видны только в этом браузере, пока вы их не закрепите.</p></div><div className="flex flex-wrap gap-2"><Button disabled={pinning || !unpinned} onClick={pinAll}>{pinning ? <Loader2 className="animate-spin" /> : <Pin />}Закрепить для всех ({unpinned})</Button><Button variant="secondary" onClick={() => { if (confirm("Вернуть исходный каталог?")) resetCatalog(); }}><RotateCcw />Сбросить каталог</Button></div></div>
     <form onSubmit={submit} className="grid gap-4 rounded-lg border border-border bg-card p-4 md:grid-cols-2">
       <h2 className="font-black md:col-span-2">{editing ? `Редактирование: ${form.title}` : "Новая игра"}</h2>
       <label className="space-y-1 text-sm">Название<Input value={form.title} onChange={e => set("title", e.target.value)} placeholder="Например, Moto X3M" /></label>

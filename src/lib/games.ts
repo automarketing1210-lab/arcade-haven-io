@@ -16,6 +16,7 @@ import floralContourImage from "@/assets/cover-action-floral-contour.jpg";
 import tideglassCartographerImage from "@/assets/cover-action-tideglass-cartographer.jpg";
 import clockworkTernImage from "@/assets/cover-adventure-clockwork-tern.jpg";
 import prismaticVaultImage from "@/assets/cover-adventure-prismatic-vault.jpg";
+import pinnedGames from "@/lib/pinned-games.json";
 export type Category =
   | "Экшен"
   | "Приключения"
@@ -49,7 +50,7 @@ export type Game = {
   embedUrl?: string | undefined;
 };
 
-export const games: Game[] = [
+const baseCatalog: Game[] = [
   {
     slug: "neon-drift",
     title: "Neon Drift",
@@ -2413,6 +2414,13 @@ export const games: Game[] = [
     year: 2026,
     accent: "coral",
   },
+];
+
+// Games pinned from the admin panel override base entries by slug; new slugs go first.
+const pinned = pinnedGames as Game[];
+export const games: Game[] = [
+  ...pinned.filter(p => !baseCatalog.some(b => b.slug === p.slug)),
+  ...baseCatalog.map(b => pinned.find(p => p.slug === b.slug) ?? b),
 ];
 
 export const categories: Category[] = [
