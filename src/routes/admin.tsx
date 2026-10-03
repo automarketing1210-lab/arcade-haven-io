@@ -38,7 +38,7 @@ function AdminPage() {
   const [selected, setSelected] = useState<string[]>([]); const [busy, setBusy] = useState<Record<string, string>>({}); const [batchRunning, setBatchRunning] = useState(false);
   // Always merge into the latest stored version so sequential generations don't overwrite each other.
   const catalogRef = useRef(catalog); catalogRef.current = catalog;
-  const patch = (slug: string, changes: Partial<Game>) => { const current = catalogRef.current.find(g => g.slug === slug); if (current) { const next = { ...current, ...changes }; catalogRef.current = catalogRef.current.map(g => g.slug === slug ? next : g); saveGame(next); } };
+  const patch = (slug: string, changes: Partial<Game>) => { const current = catalogRef.current.find(g => g.slug === slug); if (current) { const next = { ...current, ...changes }; catalogRef.current = catalogRef.current.map(g => g.slug === slug ? next : g); saveGame(next); void fetch("/api/pin-catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ games: [next] }) }).catch(() => {}); } };
   const makeCover = async (game: Game, title: string, description: string) => { const { image } = await requestGeneration({ kind: "cover", category: game.category, title, description }); if (image) patch(game.slug, { image: await shrinkImage(image) }); };
   const run = async (game: Game, kind: "title" | "description" | "cover" | "all") => {
     setBusy(b => ({ ...b, [game.slug]: kind }));
