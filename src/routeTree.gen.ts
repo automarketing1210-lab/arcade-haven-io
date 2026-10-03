@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
+import { Route as ApiPinCatalogRouteImport } from './routes/api/pin-catalog'
 import { Route as GameSlugRouteImport } from './routes/game.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +36,11 @@ const ApiGenerateRoute = ApiGenerateRouteImport.update({
   path: '/api/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPinCatalogRoute = ApiPinCatalogRouteImport.update({
+  id: '/api/pin-catalog',
+  path: '/api/pin-catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GameSlugRoute = GameSlugRouteImport.update({
   id: '/game/$slug',
   path: '/game/$slug',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/profile': typeof ProfileRoute
   '/api/generate': typeof ApiGenerateRoute
+  '/api/pin-catalog': typeof ApiPinCatalogRoute
   '/game/$slug': typeof GameSlugRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/profile': typeof ProfileRoute
   '/api/generate': typeof ApiGenerateRoute
+  '/api/pin-catalog': typeof ApiPinCatalogRoute
   '/game/$slug': typeof GameSlugRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,34 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/profile': typeof ProfileRoute
   '/api/generate': typeof ApiGenerateRoute
+  '/api/pin-catalog': typeof ApiPinCatalogRoute
   '/game/$slug': typeof GameSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/profile' | '/api/generate' | '/game/$slug'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/profile'
+    | '/api/generate'
+    | '/api/pin-catalog'
+    | '/game/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/profile' | '/api/generate' | '/game/$slug'
-  id: '__root__' | '/' | '/admin' | '/profile' | '/api/generate' | '/game/$slug'
+  to:
+    | '/'
+    | '/admin'
+    | '/profile'
+    | '/api/generate'
+    | '/api/pin-catalog'
+    | '/game/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/profile'
+    | '/api/generate'
+    | '/api/pin-catalog'
+    | '/game/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +104,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   ProfileRoute: typeof ProfileRoute
   ApiGenerateRoute: typeof ApiGenerateRoute
+  ApiPinCatalogRoute: typeof ApiPinCatalogRoute
   GameSlugRoute: typeof GameSlugRoute
 }
 
@@ -109,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/pin-catalog': {
+      id: '/api/pin-catalog'
+      path: '/api/pin-catalog'
+      fullPath: '/api/pin-catalog'
+      preLoaderRoute: typeof ApiPinCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/game/$slug': {
       id: '/game/$slug'
       path: '/game/$slug'
@@ -124,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   ProfileRoute: ProfileRoute,
   ApiGenerateRoute: ApiGenerateRoute,
+  ApiPinCatalogRoute: ApiPinCatalogRoute,
   GameSlugRoute: GameSlugRoute,
 }
 export const routeTree = rootRouteImport
